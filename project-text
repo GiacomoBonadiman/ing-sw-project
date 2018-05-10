@@ -1,0 +1,22 @@
+Si vuole progettare un sistema informatico per gestire il magazzino di una catena di negozi di articoli sportivi.
+Il negozio vende articoli di diversa tipologia, raggruppati per sport. Per ogni tipo articolo si registra: un nome
+univoco, una descrizione, lo sport, e i materiali utilizzati per produrlo. Il sistema registra tutti gli articoli in magazzino
+memorizzando per ogni articolo: il tipo di articolo, un codice univoco, il prezzo e la data di produzione.
+Gli articoli in magazzino vengono gestiti dal sistema che registra per ogni ingresso in magazzino: un codice interno
+univoco, la data e tutti articoli entrati e le loro posizioni in magazzino. Per ogni uscita il sistema registra: la data e il
+numero di bolla (univoco), tutti gli articoli usciti, il negozio che li ha ordinati e lo spedizioniere che li ritira. Per ogni
+negozio della catena il sistema registra: il codice fiscale, il nome, l’indirizzo e la città.
+Il sistema memorizza inoltre gli ordini dei negozi registrando: il negozio che ha effettuato l’ordine, un codice ordine
+univoco, la data dell’ordine, i tipi di articolo ordinati e per ogni tipo di articolo la quantità ordinata e il prezzo totale.
+Quando un ordine viene evaso si registra un’uscita dal magazzino che viene collegata all’ordine al quale si
+riferisce. Si suppone che per ogni ordine evaso si abbia una sola uscita dal magazzino.
+Per ogni tipo di articolo il sistema memorizza esplicitamente alla fine di ogni mese dell’anno la quantità di articoli
+ricevuti in magazzino e la quantità di articoli usciti.
+Il sistema deve permettere ai magazzinieri di inserire le informazioni relative ai movimenti di ingresso e uscita dal
+magazzino. I magazzinieri, inoltre, possono spostare un articolo da una posizione ad un’altra del magazzino, al fine
+di ottimizzare l’occupazione del magazzino.
+La segreteria amministrativa della catena di negozi è responsabile dell’inserimento dei tipi di articolo. Essa può
+accedere al sistema e visualizzare i movimenti di magazzino rispetto agli ordini dei vari negozi. Tutti gli utenti sono
+opportunamente autenticati dal sistema, prima che possano accedere alle funzionalità specifiche.
+I responsabili dei negozi possono accedere al sistema per effettuare gli ordini e per avere un riassunto degli ordini
+passati. 

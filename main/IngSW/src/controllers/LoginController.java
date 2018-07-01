@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 import com.google.gson.Gson;
 
 import containers.UserContainer;
-import interfaces.IJobView;
+import interfaces.IUpdateView;
 import models.User;
 import views.JobViewFactory;
 import views.LoginView;
@@ -19,7 +19,7 @@ public class LoginController {
 	public boolean onLoginButtonClicked(LoginView view) {
 		user = UserContainer.getInstance().getUsers().get(view.getUsernameField().getText());
 		if (user != null) {
-			IJobView jobView = JobViewFactory.getView(user.getUserType());
+			IUpdateView jobView = JobViewFactory.getView(user.getUserType());
 			((JFrame)jobView).setVisible(true);
 			return true;
 		}

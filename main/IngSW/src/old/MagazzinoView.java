@@ -63,8 +63,8 @@ public class MagazzinoView extends javax.swing.JFrame {
     private void initComponents() {
 
         //ingressoDataDialog = new IngressoDataDialog();
-        uscitaDataDialog = new UscitaDataDialog();
-        articoloDataDialog = new ArticoloDataDialog();
+        //uscitaDataDialog = new UscitaDataDialog();
+        //articoloDataDialog = new ArticoloDataDialog();
         titlePanel = new javax.swing.JPanel();
         magazzinoLabel = new javax.swing.JLabel();
         contentPanel = new javax.swing.JPanel();
@@ -162,7 +162,7 @@ public class MagazzinoView extends javax.swing.JFrame {
                   if (index >= 0) {
                     String str = ((JList<String>)mouseEvent.getSource()).getModel().getElementAt(index);
                     Uscita uscita = Magazzino.getInstance().getUscite().get(str);
-                    uscitaDataDialog.setData(uscita.getArticolo().getUnicode(), uscita.getUscBolla(), uscita.getUscDate(), uscita.getNegozio().getCodFiscale(), uscita.getSpedizioniere());
+                    //uscitaDataDialog.setData(uscita.getArticolo().getUnicode(), uscita.getUscBolla(), uscita.getUscDate(), uscita.getNegozio().getCodFiscale(), uscita.getSpedizioniere());
                     uscitaDataDialog.setVisible(true);
                   }
                 }

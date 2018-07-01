@@ -1,0 +1,14 @@
+{
+	"Palla": {
+			"uniname": "Palla",
+			"description": "Palla da Baseball",
+			"sport": "Baseball",
+			"materials": "Cuoio, cotone"
+		},
+	"Mazza": {
+			"uniname": "Mazza",
+			"description": "Mazza da Baseball",
+			"sport": "Baseball",
+			"materials": "Legno"
+		}
+}

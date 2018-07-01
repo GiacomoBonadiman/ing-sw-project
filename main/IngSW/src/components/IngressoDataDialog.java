@@ -4,14 +4,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.awt.Dialog.ModalExclusionType;
-
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
-import containers.Magazzino;
 import controllers.MagazzinoController;
 import models.Ingresso;
 
@@ -29,8 +25,8 @@ public class IngressoDataDialog extends JDialog {
 		setAlwaysOnTop(true);
 		setModal(true);
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
-		setPreferredSize(new Dimension(400, 400));
-		setSize(new Dimension(400, 400));
+		setPreferredSize(new Dimension(500, 400));
+		setSize(new Dimension(500, 400));
 		
 		this.controller = controller;
 		this.selectedIngresso = selectedIngresso;

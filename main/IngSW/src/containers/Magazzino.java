@@ -2,7 +2,10 @@ package containers;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -13,7 +16,6 @@ import com.google.gson.reflect.TypeToken;
 import models.Articolo;
 import models.Ingresso;
 import models.Uscita;
-import models.User;
 
 public class Magazzino {
 
@@ -31,11 +33,13 @@ public class Magazzino {
 	}
 	
 	public void loadIngressi() {
-		try {
-			Reader reader = new FileReader("C:\\Users\\hartmann\\Desktop\\JSON\\ingressi.txt");
+		try (Reader reader = new FileReader("C:\\Users\\hartmann\\Desktop\\JSON\\ingressi.txt")) {
 			JsonParser parser = new JsonParser();
 			ingressi = gson.fromJson(parser.parse(reader), new TypeToken<HashMap<String, Ingresso>>(){}.getType());
+			
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -44,12 +48,28 @@ public class Magazzino {
 		return !ingressi.isEmpty();
 	}
 	
+	public void insertIngressoInMagazzino(Ingresso ingresso) {
+		ingressi.put(ingresso.getIngrUnicode(), ingresso);
+	}
+	
+	public void saveIngressi() {
+		try (Writer writer = new FileWriter("C:\\Users\\hartmann\\Desktop\\JSON\\ingressi.txt")) {
+			String json = gson.toJson(ingressi);
+			writer.write(json);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void loadArticoli() {
-		try {
-			Reader reader = new FileReader("C:\\Users\\hartmann\\Desktop\\JSON\\articoli.txt");
+		try (Reader reader = new FileReader("C:\\Users\\hartmann\\Desktop\\JSON\\articoli.txt")) {
 			JsonParser parser = new JsonParser();
 			articoli = gson.fromJson(parser.parse(reader), new TypeToken<HashMap<String, Articolo>>(){}.getType());
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -58,18 +78,53 @@ public class Magazzino {
 		return !articoli.isEmpty();
 	}
 	
+	public void insertArticoloInMagazzino(Articolo articolo) {
+		articoli.put(articolo.getUnicode(), articolo);
+	}
+	
+	public void deleteArticolo(Articolo articolo) {
+		articoli.remove(articolo.getUnicode());
+	}
+	
+	public void saveArticoli() {
+		try (Writer writer = new FileWriter("C:\\Users\\hartmann\\Desktop\\JSON\\articoli.txt")) {
+			String json = gson.toJson(articoli);
+			writer.write(json);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void loadUscite() {
-		try {
-			Reader reader = new FileReader("C:\\Users\\hartmann\\Desktop\\JSON\\uscite.txt");
+		try (Reader reader = new FileReader("C:\\Users\\hartmann\\Desktop\\JSON\\uscite.txt")) {
 			JsonParser parser = new JsonParser();
 			uscite = gson.fromJson(parser.parse(reader), new TypeToken<HashMap<String, Uscita>>(){}.getType());
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public boolean areUsciteLoaded() {
 		return !uscite.isEmpty();
+	}
+	
+	public void insertUscitaInMagazzino(Uscita uscita) {
+		uscite.put(uscita.getUscBolla(), uscita);
+	}
+	
+	public void saveUscite() {
+		try (Writer writer = new FileWriter("C:\\Users\\hartmann\\Desktop\\JSON\\uscite.txt")) {
+			String json = gson.toJson(uscite);
+			writer.write(json);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void registerIngresso(HashSet<Ingresso> other) {

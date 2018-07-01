@@ -1,0 +1,17 @@
+{
+	"Gianni": {
+			"username": "Gianni",
+			"password": "GGEZ",
+			"userType": "Magazziniere"
+		  },
+	"Claudio": {
+			"username": "Claudio",
+			"password": "Gaudio",
+			"userType": "Responsabile"
+		   },
+	"Giacomo": {
+			"username": "Giacomo",
+			"password": "Franco",
+			"userType": "Mona"
+		   }
+}

@@ -1,188 +1,298 @@
 package components;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.text.ParseException;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
-import javax.swing.AbstractListModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
-import org.jdesktop.swingx.JXDatePicker;
+import com.toedter.calendar.JDateChooser;
 
-import containers.Magazzino;
 import controllers.MagazzinoController;
+import interfaces.ILoadView;
+import interfaces.IUpdateView;
+import miscellaneous.RefreshableListModel;
+import models.Uscita;
 
-public class UscitaDialog extends JDialog {
+public class UscitaDialog extends JDialog implements ILoadView, IUpdateView {
 
 	private MagazzinoController controller;
 	
-	private JDialog uscitaDialog;
-	private JScrollPane dialogArticoliScroll;
-	private JList dialogArticoliList;
-	private JXDatePicker uscitaDatePicker;
-	private JLabel uscBolla, negozioLabel, dateLabel, spedizioniereLabel;
-	private JTextField uscBollaTextField, negozioTextField, spedizioniereTextField;
-	private JButton articoloButton, createUscitaButton;
+	private JPanel leftPanel, centerPanel, rightPanel;
+	private JScrollPane dialogArticoliScroll, dialogUsciteScroll;
+	private RefreshableListModel<String> dialogArticoliModel, dialogUsciteModel;
+	private JList<String> dialogArticoliList, dialogUsciteList;
+	private JDateChooser uscitaDateChooser;
+	private JLabel bollaLabel, negozioLabel, dateLabel, spedizioniereLabel, qtyLabel;
+	private JTextField bollaTextField, negozioTextField, spedizioniereTextField;
+	private JButton addToListButton, createUscitaButton, linkOrdineButton;
+	private JSpinner qtySpinner;
+	
+	private final List<String> tempBollaUscite = new ArrayList<String>();
+	private final List<Uscita> tempUscite = new ArrayList<Uscita>();
+	private String selectedOrd;
 
 	public UscitaDialog(MagazzinoController controller) {
 		super();
-		uscitaDialog.setAlwaysOnTop(true);
-        uscitaDialog.setModal(true);
-        uscitaDialog.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
-        uscitaDialog.setPreferredSize(new Dimension(600, 400));
-        uscitaDialog.setSize(new Dimension(600, 400));
+	
+		setAlwaysOnTop(true);
+        setModal(true);
+        setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+        setPreferredSize(new Dimension(800, 500));
+        setSize(new Dimension(800, 500));
         
+		this.controller = controller;
+		controller.addWindowToList(this);
+		
+        
+        load();
 		initComponents();
 		buildLayout();
 		
-		this.controller = controller;
 	}
 	
 	private void initComponents() {
-		uscitaDialog = new JDialog();
-        dialogArticoliScroll = new JScrollPane();
-        dialogArticoliList = new JList<>();
-        uscitaDatePicker = new JXDatePicker();
-        uscBolla = new JLabel();
-        uscBollaTextField = new JTextField();
-        negozioLabel = new JLabel();
+		leftPanel = new JPanel(new GridBagLayout());
+		centerPanel = new JPanel(new GridBagLayout());
+		rightPanel = new JPanel(new GridBagLayout());
+        dialogArticoliModel = new RefreshableListModel<>(controller.getUsciteInMagazzino());
+        dialogArticoliList = new JList<>(dialogArticoliModel);
+        dialogArticoliList.setPreferredSize(new Dimension(245, 300));
+        dialogArticoliList.setVisibleRowCount(-1);
+        ((DefaultListCellRenderer)dialogArticoliList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        dialogArticoliScroll = new JScrollPane(dialogArticoliList);
+        linkOrdineButton = new JButton("Link Ordine");
+        dialogUsciteModel = new RefreshableListModel<>(tempBollaUscite.toArray(new String[0]));
+        dialogUsciteList = new JList<>(dialogUsciteModel);
+        dialogUsciteList.setPreferredSize(new Dimension(245, 300));
+        dialogUsciteList.setVisibleRowCount(-1);
+        ((DefaultListCellRenderer)dialogUsciteList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        dialogUsciteScroll = new JScrollPane(dialogUsciteList);
+        uscitaDateChooser = new JDateChooser();
+        addToListButton = new JButton("Add to List");
+        bollaLabel = new JLabel("Bolla", JLabel.CENTER);
+        bollaTextField = new JTextField();
+        negozioLabel = new JLabel("Negozio", JLabel.CENTER);
         negozioTextField = new JTextField();
-        articoloButton = new JButton();
-        dateLabel = new JLabel();
-        createUscitaButton = new JButton();
-        spedizioniereLabel = new JLabel();
+        dateLabel = new JLabel("Data", JLabel.CENTER);
+        qtyLabel = new JLabel("Qty", JLabel.CENTER);
+        SpinnerNumberModel qtyModel = new SpinnerNumberModel(1, 1, 999999, 1);
+		qtySpinner = new JSpinner(qtyModel);
+        createUscitaButton = new JButton("Create Uscita");
+        spedizioniereLabel = new JLabel("Spedizioniere", JLabel.CENTER);
         spedizioniereTextField = new JTextField();
 	}
 	
 	private void buildLayout() {
-		dialogArticoliList.setModel(new AbstractListModel<String>() {
-            String[] strings = (String[]) Magazzino.getInstance().getArticoli().keySet().toArray();
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        dialogArticoliScroll.setViewportView(dialogArticoliList);
+		GridBagConstraints constr = new GridBagConstraints();
+        
+		dialogArticoliList.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JList<String> list = (JList<String>)e.getSource();
+					ArticoloDataDialog dialog = controller.articoliListItemPressed(list.getSelectedValue());
+					dialog.setVisible(true);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
 		
-        uscBolla.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        uscBolla.setText("Bolla");
+		});
+		
+		dialogUsciteList.addMouseListener(new MouseListener() {
 
-        uscBollaTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        uscBollaTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                uscBollaTextFieldActionPerformed(evt);
-            }
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JList<String> list = (JList<String>)e.getSource();
+					UscitaDataDialog dialog = controller.tempUsciteListItemPressed(list.getSelectedValue(), tempUscite);
+					dialog.setVisible(true);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+		
+		});
+		
+        constr.fill = GridBagConstraints.BOTH;
+        constr.weighty = 0.75;
+        constr.insets = new Insets(5, 0, 0, 0);
+        leftPanel.add(dialogArticoliScroll, constr);
+        
+        constr.fill = GridBagConstraints.HORIZONTAL;
+        constr.gridy = 1;
+        constr.weighty = 0.25;
+        constr.insets = new Insets(10, 0, 0, 0);
+        linkOrdineButton.addActionListener(new ActionListener( ) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+        leftPanel.add(linkOrdineButton, constr);
+        
+        dateLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        constr.gridy = 0;
+        constr.weighty = 0.10;
+        constr.insets = new Insets(5, 0, 0, 0);
+        centerPanel.add(dateLabel, constr);
+        
+        constr.gridy = 1;
+        centerPanel.add(uscitaDateChooser, constr);
+        
+        bollaLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        constr.gridy = 2;
+        constr.insets = new Insets(10, 0, 0, 0);
+        centerPanel.add(bollaLabel, constr);
+        
+        constr.gridy = 3;
+        constr.insets = new Insets(5, 0, 0, 0);
+        centerPanel.add(bollaTextField, constr);
+        
+        negozioLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        constr.gridy = 4;
+        constr.insets = new Insets(10, 0, 0, 0);
+        centerPanel.add(negozioLabel, constr);
+        
+        constr.gridy = 5;
+        constr.insets = new Insets(5, 0, 0, 0);
+        centerPanel.add(negozioTextField, constr);
+        
+        constr.gridy = 6;
+        constr.insets = new Insets(10, 0, 0, 0);
+        centerPanel.add(spedizioniereLabel, constr);
+        
+        constr.gridy = 7;
+        constr.insets = new Insets(5, 0, 0, 0);
+        centerPanel.add(spedizioniereTextField, constr);
+        
+        constr.gridy = 8;
+        constr.insets = new Insets(10, 0, 0, 0);
+        centerPanel.add(qtyLabel, constr);
+        
+        constr.gridy = 9;
+        constr.insets = new Insets(5, 0, 0, 0);
+        centerPanel.add(qtySpinner, constr);
+        
+        constr.gridy = 10;
+        constr.weighty = 0.20;
+        constr.insets = new Insets(20, 0, 0, 0);
+        addToListButton.addActionListener(new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		if (dialogArticoliList.isSelectionEmpty()) {
+        			return;
+        		}
+        		if (bollaTextField.getText() == null || !controller.isUscitaNew(bollaTextField.getText())) {
+        			return;
+        		}
+        		if (uscitaDateChooser.getCalendar().after(Calendar.getInstance().getTime())) {
+        			return;
+        		}
+        		if (negozioTextField.getText() == null || !controller.isNegozioCorrect(negozioTextField.getText())) {
+        			return;
+        		}
+        		if (spedizioniereTextField.getText() == null) {
+        			return;
+        		}
+        		try {
+        			qtySpinner.commitEdit();
+        		} catch (ParseException ex) {
+        			ex.printStackTrace();
+        		}
+        		if (!controller.verifyEnoughArticoli(dialogArticoliList.getSelectedValue(), (Integer)qtySpinner.getValue())) {
+        			return;
+        		}
+        		
+        		if (tempBollaUscite.contains(bollaTextField.getText() + dialogArticoliList.getSelectedValue())) {
+        			return;
+        		}
+        		tempBollaUscite.add(bollaTextField.getText() + dialogArticoliList.getSelectedValue());
+        		tempUscite.add(controller.addUscitaToListButtonActionPerformed(uscitaDateChooser.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), bollaTextField.getText() + dialogArticoliList.getSelectedValue(), dialogArticoliList.getSelectedValue(), negozioTextField.getText(), spedizioniereTextField.getText(), selectedOrd, (Integer)qtySpinner.getValue()));
+        		update();
+        	}
         });
-
-        negozioLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        negozioLabel.setText("Negozio");
-
-        negozioTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        negozioTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                negozioTextFieldActionPerformed(evt);
-            }
+        centerPanel.add(addToListButton, constr);
+        
+        constr.fill = GridBagConstraints.BOTH;
+        constr.gridy = 0;
+        constr.weighty = 0.75;
+        constr.insets = new Insets(5, 0, 0, 0);
+        rightPanel.add(dialogUsciteScroll, constr);
+        
+        constr.fill = GridBagConstraints.HORIZONTAL;
+        constr.gridy = 1;
+        constr.weighty = 0.25;
+        constr.insets = new Insets(10, 0, 0, 0);
+        createUscitaButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.createUsciteButtonActionPerformed(tempUscite);
+				dispose();
+			}
+        	
         });
-
-        articoloButton.setText("Add Articolo");
-        articoloButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                controller.articoloButtonActionPerformed(evt).setVisible(true);
-            }
-        });
-
-        dateLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        dateLabel.setText("Date");
-
-        createUscitaButton.setText("Create");
-        createUscitaButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createUscitaButtonActionPerformed(evt);
-            }
-        });
-
-        spedizioniereLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        spedizioniereLabel.setText("Spedizioniere");
-
-        spedizioniereTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        spedizioniereTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                spedizioniereTextFieldActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout uscitaDialogLayout = new javax.swing.GroupLayout(uscitaDialog.getContentPane());
-        uscitaDialog.getContentPane().setLayout(uscitaDialogLayout);
-        uscitaDialogLayout.setHorizontalGroup(
-            uscitaDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(uscitaDialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(dialogArticoliScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(articoloButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
-                .addGroup(uscitaDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(spedizioniereTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                    .addGroup(uscitaDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(spedizioniereLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(uscitaDatePicker, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                        .addComponent(uscBolla, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(uscBollaTextField, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(negozioLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(negozioTextField, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(dateLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(createUscitaButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        uscitaDialogLayout.setVerticalGroup(
-            uscitaDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(uscitaDialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(uscitaDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(uscitaDialogLayout.createSequentialGroup()
-                        .addComponent(dateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(uscitaDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(uscBolla, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(uscBollaTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(negozioLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(negozioTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(spedizioniereLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(spedizioniereTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addGroup(uscitaDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(articoloButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(createUscitaButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(dialogArticoliScroll))
-                .addContainerGap())
-        );
+        rightPanel.add(createUscitaButton, constr);
+        
+        add(leftPanel, BorderLayout.WEST);
+        add(centerPanel, BorderLayout.CENTER);
+        add(rightPanel, BorderLayout.EAST);
+        
+        pack();
 	}
-
-	protected void spedizioniereTextFieldActionPerformed(ActionEvent evt) {
-		// TODO Auto-generated method stub
-		
+	
+	public void load() {
+		controller.loadNegozi();
 	}
-
-	protected void createUscitaButtonActionPerformed(ActionEvent evt) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	protected void negozioTextFieldActionPerformed(ActionEvent evt) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	protected void uscBollaTextFieldActionPerformed(ActionEvent evt) {
-		// TODO Auto-generated method stub
-		
+	
+	public void update() {
+		dialogArticoliModel.refreshList(controller.getArticoliInMagazzino());
+		dialogArticoliList.updateUI();
+		dialogUsciteModel.refreshList(tempBollaUscite.toArray(new String[0]));
+		dialogUsciteList.updateUI();
 	}
 }

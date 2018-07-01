@@ -1,5 +1,5 @@
 package interfaces;
 
-public interface IJobDialog {
+public interface ILoadView {
 	void load();
 }

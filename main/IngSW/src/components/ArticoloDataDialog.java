@@ -1,113 +1,95 @@
 package components;
 
-import java.awt.Dialog.ModalExclusionType;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
+import controllers.MagazzinoController;
+import models.Articolo;
+
 public class ArticoloDataDialog extends JDialog {
 	
-	private JLabel articoloTitleLabel, articoloContentLabel, typeTitleLabel, typeContentLabel, productionDateTitleLabel,
-				   productionDateContentLabel, qtyTitleLabel, qtyContentLabel, prezzoTitleLabel, prezzoContentLabel;
+	private MagazzinoController controller;
+	private Articolo articolo;
+	
+	private JLabel articoloTitleLabel, articoloContentLabel, tipoTitleLabel, tipoContentLabel, productionDateTitleLabel,
+				   productionDateContentLabel, qtyTitleLabel, qtyContentLabel, priceTitleLabel, priceContentLabel;
 
-	public ArticoloDataDialog() {
+	public ArticoloDataDialog(MagazzinoController controller, Articolo articolo) {
 		super();
+		setLayout(new GridBagLayout());
 		setAlwaysOnTop(true);
 		setModal(true);
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+		setPreferredSize(new Dimension(400, 400));
+		setSize(new Dimension(400, 400));
+		
+		this.controller = controller;
+		this.articolo = articolo;
 		
 		initComponents();
-		buildLayout();
+		buildView();
 	}
 
-	private void buildLayout() {
-		articoloTitleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        articoloTitleLabel.setText("Unicode:");
-
-        articoloContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        typeTitleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        typeTitleLabel.setText("Type:");
-
-        typeContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        productionDateTitleLabel.setText("Production Date:");
-
-        productionDateContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        qtyTitleLabel.setText("Qty:");
-
-        qtyContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        prezzoTitleLabel.setText("Prezzo:");
-
-        prezzoContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        javax.swing.GroupLayout articoloDataDialogLayout = new javax.swing.GroupLayout(this.getContentPane());
-        this.getContentPane().setLayout(articoloDataDialogLayout);
-        articoloDataDialogLayout.setHorizontalGroup(
-            articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                        .addComponent(productionDateTitleLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(productionDateContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
-                    .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                        .addComponent(typeTitleLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(typeContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                        .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(qtyTitleLabel)
-                            .addComponent(articoloTitleLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(articoloContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(qtyContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                        .addComponent(prezzoTitleLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(prezzoContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        articoloDataDialogLayout.setVerticalGroup(
-            articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(articoloDataDialogLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(articoloTitleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(articoloContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(typeTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(typeContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(productionDateTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(productionDateContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(qtyTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(qtyContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(articoloDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(prezzoTitleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(prezzoContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
+	private void buildView() {
+		GridBagConstraints constr = new GridBagConstraints();
+        
+		constr.fill = GridBagConstraints.HORIZONTAL;
+		constr.weightx = 0.25;
+		constr.weighty = 0.25;
+		constr.insets = new Insets(5, 5, 5, 5);
+		add(articoloTitleLabel, constr);
+		
+		constr.gridx = 1;
+		add(articoloContentLabel, constr);
+		
+		constr.gridx = 0;
+		constr.gridy = 1;
+		add(tipoTitleLabel, constr);
+		
+		constr.gridx = 1;
+		add(tipoContentLabel, constr);
+		
+		constr.gridx = 2;
+		constr.gridy = 0;
+		constr.insets = new Insets(5, 10, 5, 5);
+		add(productionDateTitleLabel, constr);
+		
+		constr.gridx = 3;
+		add(productionDateContentLabel, constr);
+		
+		constr.gridx = 2;
+		constr.gridy = 1;
+		add(qtyTitleLabel, constr);
+		
+		constr.gridx = 3;
+		add(qtyContentLabel, constr);
+		
+		constr.gridx = 4;
+		constr.gridy = 0;
+		add(priceTitleLabel, constr);
+		
+		constr.gridx = 5;
+		add(priceContentLabel, constr);
+		
+		pack();
 	}
 
 	private void initComponents() {
-		articoloTitleLabel = new JLabel();
-        articoloContentLabel = new JLabel();
-        typeTitleLabel = new JLabel();
-        typeContentLabel = new JLabel();
-        productionDateTitleLabel = new JLabel();
-        productionDateContentLabel = new JLabel();
-        qtyTitleLabel = new JLabel();
-        qtyContentLabel = new JLabel();
-        prezzoTitleLabel = new JLabel();
-        prezzoContentLabel = new JLabel();
+		articoloTitleLabel = new JLabel("Articolo:", JLabel.CENTER);
+        articoloContentLabel = new JLabel(articolo.getUnicode(), JLabel.CENTER);
+        tipoTitleLabel = new JLabel("Tipo:", JLabel.CENTER);
+        tipoContentLabel = new JLabel(articolo.getType().getUniname(), JLabel.CENTER);
+        productionDateTitleLabel = new JLabel("Data Produzione:", JLabel.CENTER);
+        productionDateContentLabel = new JLabel(articolo.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yy")), JLabel.CENTER);
+        qtyTitleLabel = new JLabel("Qty:", JLabel.CENTER);
+        qtyContentLabel = new JLabel(Integer.toString(articolo.getQty()), JLabel.CENTER);
+        priceTitleLabel = new JLabel("Prezzo:", JLabel.CENTER);
+        priceContentLabel = new JLabel(Double.toString(articolo.getPrice()), JLabel.CENTER);
 	}
 }

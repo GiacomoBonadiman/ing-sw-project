@@ -1,0 +1,66 @@
+{
+	"102133756589": {
+		"uscDate": {
+			"year": 2015,
+			"month": 11,
+			"day": 4
+		},
+		"uscBolla": "001711234",
+		"articolo": {
+			"type": {
+				"uniname": "Palla",
+				"description": "Palla da Baseball",
+				"sport": "Baseball",
+				"materials": "Cuoio, cotone"
+			},
+			"unicode": "756589",
+			"qty": 52,
+			"price": 12.90,
+			"date": {
+				"year": 2014,
+				"month": 7,
+				"day": 2
+			}
+		},
+		"negozio": {
+			"codFiscale": "X25C365429008000",
+			"nome": "Dunk'EM",
+			"indirizzo": "Via Martino Guardia 23",
+			"citta": "Bandierina di Castelletto, TN"
+		},
+		"spedizioniere": "TNT",
+		"linkedOrd": "0075640300"
+	},
+	"102133547649": {
+		"uscDate": {
+			"year": 2015,
+			"month": 11,
+			"day": 4
+		},
+		"uscBolla": "001711234",
+		"articolo": {
+			"type": {
+				"uniname": "Mazza",
+				"description": "Mazza da Baseball",
+				"sport": "Baseball",
+				"materials": "Legno"
+			},
+			"unicode": "547649",
+			"qty": 25,
+			"price": 44.99,
+			"date": {
+				"year": 2015,
+				"month": 1,
+				"day": 30
+			}
+		},
+		"negozio": {
+			"codFiscale": "X25C365429008000",
+			"nome": "Dunk'EM",
+			"indirizzo": "Via Martino Guardia 23",
+			"citta": "Bandierina di Castelletto, TN"
+		},
+		"spedizioniere": "TNT",
+		"linkedOrd": "0075640300"
+	}
+}

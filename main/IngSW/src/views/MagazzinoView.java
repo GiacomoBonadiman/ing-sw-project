@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -19,21 +21,24 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import components.ArticoloDataDialog;
 import components.IngressoDataDialog;
 import components.IngressoDialog;
-import containers.Magazzino;
+import components.UscitaDataDialog;
+import components.UscitaDialog;
 import controllers.MagazzinoController;
-import interfaces.IJobView;
-import models.Ingresso;
+import interfaces.ILoadView;
+import interfaces.IUpdateView;
+import miscellaneous.RefreshableListModel;
 
-public class MagazzinoView extends JFrame implements IJobView {
+public class MagazzinoView extends JFrame implements ILoadView, IUpdateView {
 	
 	private JPanel titlePanel, contentPanel;
 	private JLabel titleLabel, ingressiLabel, articoliLabel, usciteLabel;
-	private JList ingressiList, articoliList, usciteList;
+	private RefreshableListModel<String> ingressiModel, articoliModel, usciteModel;
+	private JList<String> ingressiList, articoliList, usciteList;
 	private JScrollPane ingressiScroll, articoliScroll, usciteScroll;
 	private JButton ingressiButton, usciteButton;
 	
@@ -45,6 +50,7 @@ public class MagazzinoView extends JFrame implements IJobView {
         setSize(new Dimension(800, 600));
         
         this.controller = controller;
+        this.controller.addWindowToList(this);
         
         load();
         initComponents();
@@ -58,15 +64,18 @@ public class MagazzinoView extends JFrame implements IJobView {
 		ingressiLabel = new JLabel("Ingressi", JLabel.CENTER);
 		articoliLabel = new JLabel("Articoli", JLabel.CENTER);
 		usciteLabel = new JLabel("Uscite", JLabel.CENTER);
-		ingressiList = new JList<>(controller.getMagazzino().getIngressi().keySet().toArray());
+		ingressiModel = new RefreshableListModel<>(controller.getIngressiInMagazzino());
+		ingressiList = new JList<>(ingressiModel);
 		ingressiList.setPreferredSize(new Dimension(245, 200));
 		ingressiList.setVisibleRowCount(-1);
 		((DefaultListCellRenderer)ingressiList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-		articoliList = new JList<>(controller.getMagazzino().getArticoli().keySet().toArray());
+		articoliModel = new RefreshableListModel<>(controller.getArticoliInMagazzino());
+		articoliList = new JList<>(articoliModel);
 		articoliList.setPreferredSize(new Dimension(245, 200));
 		articoliList.setVisibleRowCount(-1);
 		((DefaultListCellRenderer)articoliList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-		usciteList = new JList<>(controller.getMagazzino().getUscite().keySet().toArray());
+		usciteModel = new RefreshableListModel<>(controller.getUsciteInMagazzino());
+		usciteList = new JList<>(usciteModel);
 		usciteList.setPreferredSize(new Dimension(245, 200));
 		usciteList.setVisibleRowCount(-1);
 		((DefaultListCellRenderer)usciteList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
@@ -80,6 +89,26 @@ public class MagazzinoView extends JFrame implements IJobView {
 	private void buildView() {
 		GridBagConstraints titleConstr = new GridBagConstraints();
 		GridBagConstraints contentConstr = new GridBagConstraints();
+		
+		this.addWindowListener(new WindowListener() {
+			@Override
+			public void windowActivated(WindowEvent arg0) {}
+			@Override
+			public void windowClosed(WindowEvent e) {
+				MagazzinoView view = (MagazzinoView)e.getSource();
+				view.controller.saveAll();
+			}
+			@Override
+			public void windowClosing(WindowEvent arg0) {}
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {}
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {}
+			@Override
+			public void windowIconified(WindowEvent arg0) {}
+			@Override
+			public void windowOpened(WindowEvent arg0) {}
+		});
 		
 		ingressiList.addMouseListener(new MouseListener() {
 
@@ -97,6 +126,56 @@ public class MagazzinoView extends JFrame implements IJobView {
 				if (e.getClickCount() == 2) {
 					JList<String> list = (JList<String>)e.getSource();
 					IngressoDataDialog dialog = controller.ingressiListItemPressed(list.getSelectedValue());
+					dialog.setVisible(true);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+		
+		});
+		
+		usciteList.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JList<String> list = (JList<String>)e.getSource();
+					UscitaDataDialog dialog = controller.usciteListItemPressed(list.getSelectedValue());
+					dialog.setVisible(true);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+		
+		});
+		
+		articoliList.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JList<String> list = (JList<String>)e.getSource();
+					ArticoloDataDialog dialog = controller.articoliListItemPressed(list.getSelectedValue());
 					dialog.setVisible(true);
 				}
 			}
@@ -175,6 +254,14 @@ public class MagazzinoView extends JFrame implements IJobView {
 		contentConstr.gridy = 5;
 		contentConstr.weighty = 0.2;
 		contentConstr.insets = new Insets(10, 0, 0, 0);
+		usciteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				UscitaDialog dialog = controller.usciteButtonActionPerformed(e);
+				dialog.setVisible(true);
+			}
+			
+		});
 		contentPanel.add(usciteButton, contentConstr);
 		
 		add(titlePanel, BorderLayout.NORTH);
@@ -192,8 +279,11 @@ public class MagazzinoView extends JFrame implements IJobView {
 	
 	@Override
 	public void update() {
+		ingressiModel.refreshList(controller.getIngressiInMagazzino());
 		ingressiList.updateUI();
+		articoliModel.refreshList(controller.getArticoliInMagazzino());
 		articoliList.updateUI();
+		usciteModel.refreshList(controller.getUsciteInMagazzino());
 		usciteList.updateUI();
 	}
 }

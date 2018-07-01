@@ -11,7 +11,7 @@ public class Negozio {
         this.codFiscale = codFiscale;
 		this.nome = nome;
         this.indirizzo = indirizzo;
-        this.citta = citta;  
+        this.citta = citta;
 	}
 	
 	public String getCodFiscale() {

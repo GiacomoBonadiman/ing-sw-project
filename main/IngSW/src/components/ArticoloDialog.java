@@ -7,50 +7,42 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Locale;
-import java.awt.Dialog.ModalExclusionType;
+import java.util.Calendar;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import org.jdesktop.swingx.JXDatePicker;
+import com.toedter.calendar.JDateChooser;
 
-import containers.Magazzino;
-import containers.TypeContainer;
 import controllers.MagazzinoController;
-import interfaces.IJobDialog;
-import interfaces.IJobView;
-import models.Articolo;
+import interfaces.ILoadView;
+import interfaces.IUpdateView;
+import miscellaneous.RefreshableListModel;
 
-public class ArticoloDialog extends JDialog implements IJobView {
+public class ArticoloDialog extends JDialog implements ILoadView, IUpdateView {
 
 	private MagazzinoController controller;
 	
 	private JPanel leftPanel, rightPanel, qtyPanel;
 	private JScrollPane typeScroll;
-	private JList typeList; 
+	private RefreshableListModel<String> tipiModel;
+	private JList<String> tipiList; 
 	private JLabel productionDateLabel, unicodeLabel, qtyLabel, priceLabel;
-	private JXDatePicker productionDatePicker;
-	private JTextField unicodeTextField, qty, priceTextField;
-	private JButton qtyPlusButton, qtyMinusButton, createArticoloButton;
+	private JDateChooser dateChooser;
+	private JTextField unicodeTextField;
+	private JSpinner priceSpinner;
+	private JButton createArticoloButton;
 	
 	public ArticoloDialog(MagazzinoController controller) {
 		super();
@@ -70,23 +62,19 @@ public class ArticoloDialog extends JDialog implements IJobView {
 	private void initComponents() {
 		leftPanel = new JPanel(new GridBagLayout());
 		rightPanel = new JPanel(new GridBagLayout());
-		qtyPanel = new JPanel();
-		qtyPanel.setLayout(new BoxLayout(qtyPanel, BoxLayout.X_AXIS));
-        typeList = new JList<>(controller.getTypeContainer().getTypes().keySet().toArray());
-        typeList.setPreferredSize(new Dimension(245, 200));
-        typeList.setVisibleRowCount(-1);
-		((DefaultListCellRenderer)typeList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-        typeScroll = new JScrollPane(typeList);
+		tipiModel = new RefreshableListModel<>(controller.getTipiInContainer());
+        tipiList = new JList<>(tipiModel);
+        tipiList.setPreferredSize(new Dimension(245, 200));
+        tipiList.setVisibleRowCount(-1);
+		((DefaultListCellRenderer)tipiList.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        typeScroll = new JScrollPane(tipiList);
         productionDateLabel = new JLabel("Production Date", JLabel.CENTER);
-        productionDatePicker = new JXDatePicker();
+        dateChooser = new JDateChooser();
         unicodeLabel = new JLabel("Unicode", JLabel.CENTER);
         unicodeTextField = new JTextField();
-        qtyLabel = new JLabel("Qty", JLabel.CENTER);
-        qty = new JTextField("1");
-        qtyPlusButton = new JButton("+");
-        qtyMinusButton = new JButton("-");
         priceLabel = new JLabel("Price", JLabel.CENTER);
-        priceTextField = new JTextField();
+        SpinnerNumberModel priceModel = new SpinnerNumberModel(0.1, 0.1, 999999.99, 0.01);
+        priceSpinner = new JSpinner(priceModel);
         createArticoloButton = new JButton("Create");
 	}
 	
@@ -103,7 +91,7 @@ public class ArticoloDialog extends JDialog implements IJobView {
 		rightPanel.add(productionDateLabel, constr);
 		
 		constr.gridy = 1;
-		rightPanel.add(productionDatePicker, constr);
+		rightPanel.add(dateChooser, constr);
 		
 		constr.gridy = 2;
 		constr.insets = new Insets(10, 5, 5 , 5);
@@ -113,73 +101,36 @@ public class ArticoloDialog extends JDialog implements IJobView {
 		constr.insets = new Insets(5, 5, 5, 5);
 		rightPanel.add(unicodeTextField, constr);
 		
+		constr.fill = GridBagConstraints.HORIZONTAL;
 		constr.gridy = 4;
-		constr.insets = new Insets(10, 5, 5 , 5);
-		rightPanel.add(qtyLabel, constr);
-		
-		constr.fill = GridBagConstraints.HORIZONTAL;
-		constr.gridy = 5;
-		constr.insets = new Insets(5, 5, 5, 5);
-		
-		qtyMinusButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.minusButtonPressed(e, qty);
-			}
-		});
-		qtyPanel.add(qtyMinusButton);
-		qtyPanel.add(qty);
-		qtyPlusButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.plusButtonActionPerformed(e, qty);
-			}
-		});
-		qtyPanel.add(qtyPlusButton);
-		rightPanel.add(qtyPanel, constr);
-		
-		constr.fill = GridBagConstraints.HORIZONTAL;
-		constr.gridy = 6;
 		constr.insets = new Insets(10, 5, 5, 5);
 		rightPanel.add(priceLabel, constr);
 		
-		constr.gridy = 7;
+		constr.gridy = 5;
 		constr.insets = new Insets(5, 5, 5, 5);
-		priceTextField.setText("0");
-		rightPanel.add(priceTextField, constr);
+		rightPanel.add(priceSpinner, constr);
 		
-		constr.gridy = 8;
+		constr.gridy = 6;
 		constr.insets = new Insets(20, 5, 5, 5);
 		createArticoloButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (typeList.getSelectedValue() == null) {
+				if (unicodeTextField.getText() == null || !controller.isArticoloNew(unicodeTextField.getText())) {
 					return;
 				}
-				if (unicodeTextField.getText() == null) {
+				if (dateChooser.getCalendar().after(Calendar.getInstance().getTime())) {
 					return;
 				}
-				if (qty.getText() == null) {
-					return;
-				}
-				if (priceTextField.getText() == null) {
-					return;
-				}
-				if (productionDatePicker.getDate() == null) {
+				if (tipiList.isSelectionEmpty()) {
 					return;
 				}
 				try {
-					Integer.parseInt(qty.getText());
-				} catch(NumberFormatException ex) {
-					return;
-				}
-				try {
-					Double.parseDouble(priceTextField.getText());
-				} catch(NumberFormatException ex) {
-					return;
+					priceSpinner.commitEdit();
+				} catch (ParseException ex) {
+					ex.printStackTrace();
 				}
 				
-				controller.createArticoloButtonActionPerformed(e, ArticoloDialog.this, controller.getTypeContainer().getTypes().get(String.valueOf(typeList.getSelectedValue())), unicodeTextField.getText(), Integer.parseInt(qty.getText()), Double.parseDouble(priceTextField.getText()), productionDatePicker.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+				controller.createArticoloButtonActionPerformed(e, ArticoloDialog.this, tipiList.getSelectedValue(), unicodeTextField.getText(), 0, (Double)priceSpinner.getValue(), dateChooser.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 				dispose();
 			}
 		});
@@ -196,6 +147,7 @@ public class ArticoloDialog extends JDialog implements IJobView {
 	
 	@Override
 	public void update() {
-		typeList.updateUI();
+		tipiModel.refreshList(controller.getTipiInContainer());
+		tipiList.updateUI();
 	}
 }

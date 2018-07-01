@@ -1,0 +1,14 @@
+{
+	"CF017720": {
+		"codFiscale": "CF017720",
+		"nome": "SportsNYou",
+		"indirizzo": "Via Napoli",
+		"citta": "Milano"
+	},
+	"CF335421": {
+		"codFiscale": "CF335421",
+		"nome": "LaMarina",
+		"indirizzo": "Via Pesca",
+		"citta": "Pescara"
+	}
+}

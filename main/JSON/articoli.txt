@@ -1,0 +1,35 @@
+{
+	"756589": {
+		"type": {
+			"uniname": "Palla",
+			"description": "Palla da Baseball",
+			"sport": "Baseball",
+			"materials": "Cuoio, cotone"
+		},
+		"unicode": "756589",
+		"qty": 52,
+		"price": 12.90,
+		"date": {
+			"year": 2014,
+			"month": 7,
+			"day": 2
+		}
+	},
+	"547649": {
+		"type": {
+			"uniname": "Mazza",
+			"description": "Mazza da Baseball",
+			"sport": "Baseball",
+			"materials": "Legno"
+		},
+		"unicode": "547649",
+		"qty": 36,
+		"price": 44.99,
+		"date": {
+			"year": 2015,
+			"month": 1,
+			"day": 30
+		}
+	}
+}
+	

@@ -39,7 +39,7 @@ public class TypeContainer implements IContainer<Type> {
 		return !types.isEmpty();
 	}
 	
-	public HashMap<String, Type> getTypes() {
+	public HashMap<String, Type> getTipi() {
 		return types;
 	}
 	

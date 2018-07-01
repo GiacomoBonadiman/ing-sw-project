@@ -1,123 +1,96 @@
 package components;
 
-import java.awt.Dialog.ModalExclusionType;
-import java.time.LocalDate;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
+import controllers.MagazzinoController;
+import models.Uscita;
+
 public class UscitaDataDialog extends JDialog {
 
+	private MagazzinoController controller;
+	private Uscita uscita;
+	
 	private JLabel articoloTitleLabel, articoloContentLabel, bollaTitleLabel, bollaContentLabel, dateTitleLabel,
-				   dateContentLabel, negozioTitleLabel, negozioContentLabel, spedizioniereTitleLabel, spedizioniereContentLabel;
+				   dateContentLabel, negozioTitleLabel, negozioContentLabel, spedizioniereTitleLabel, spedizioniereContentLabel,
+				   qtyTitleLabel, qtyContentLabel;
 
-	public UscitaDataDialog() {
+	public UscitaDataDialog(MagazzinoController controller, Uscita uscita) {
 		super();
+		setLayout(new GridBagLayout());
 		setAlwaysOnTop(true);
 		setModal(true);
 		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+		setPreferredSize(new Dimension(500, 400));
+		setSize(new Dimension(500, 400));
+		
+		this.controller = controller;
+		this.uscita = uscita;
 		
 		initComponents();
-		buildLayout();
+		buildView();
 	}
 
-	private void buildLayout() {
-        articoloTitleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        articoloTitleLabel.setText("Articolo:");
-
-        articoloContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        bollaTitleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        bollaTitleLabel.setText("Bolla:");
-
-        bollaContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        dateTitleLabel.setText("Date:");
-
-        dateContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        negozioTitleLabel.setText("Negozio:");
-
-        negozioContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        spedizioniereTitleLabel.setText("Spedizioniere:");
-
-        spedizioniereContentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        javax.swing.GroupLayout uscitaDataDialogLayout = new javax.swing.GroupLayout(this.getContentPane());
-        this.getContentPane().setLayout(uscitaDataDialogLayout);
-        uscitaDataDialogLayout.setHorizontalGroup(
-            uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(uscitaDataDialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(uscitaDataDialogLayout.createSequentialGroup()
-                        .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, uscitaDataDialogLayout.createSequentialGroup()
-                                .addComponent(articoloTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(9, 9, 9))
-                            .addGroup(uscitaDataDialogLayout.createSequentialGroup()
-                                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(negozioTitleLabel)
-                                    .addComponent(dateTitleLabel)
-                                    .addComponent(bollaTitleLabel))
-                                .addGap(10, 10, 10)))
-                        .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(negozioContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(dateContentLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(bollaContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(articoloContentLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(uscitaDataDialogLayout.createSequentialGroup()
-                        .addComponent(spedizioniereTitleLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(spedizioniereContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))))
-        );
-        uscitaDataDialogLayout.setVerticalGroup(
-            uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(uscitaDataDialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(articoloTitleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(articoloContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bollaTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bollaContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dateTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dateContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(negozioTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(negozioContentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(uscitaDataDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(spedizioniereTitleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(spedizioniereContentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+	private void buildView() {
+GridBagConstraints constr = new GridBagConstraints();
+        
+		constr.fill = GridBagConstraints.HORIZONTAL;
+		constr.weightx = 0.25;
+		constr.weighty = 0.25;
+		constr.insets = new Insets(5, 5, 5, 5);
+		add(articoloTitleLabel, constr);
+		
+		constr.gridx = 1;
+		add(articoloContentLabel, constr);
+		
+		constr.gridx = 0;
+		constr.gridy = 1;
+		add(bollaTitleLabel, constr);
+		
+		constr.gridx = 1;
+		add(bollaContentLabel, constr);
+		
+		constr.gridx = 2;
+		constr.gridy = 0;
+		constr.insets = new Insets(5, 10, 5, 5);
+		add(dateTitleLabel, constr);
+		
+		constr.gridx = 3;
+		add(dateContentLabel, constr);
+		
+		constr.gridx = 2;
+		constr.gridy = 1;
+		add(negozioTitleLabel, constr);
+		
+		constr.gridx = 3;
+		add(negozioContentLabel, constr);
+		
+		constr.gridx = 4;
+		constr.gridy = 0;
+		add(spedizioniereTitleLabel, constr);
+		
+		constr.gridx = 5;
+		add(spedizioniereContentLabel, constr);
+		
+		pack();
 	}
 
 	private void initComponents() {
-		articoloTitleLabel = new JLabel();
-        articoloContentLabel = new JLabel();
-        bollaTitleLabel = new JLabel();
-        bollaContentLabel = new JLabel();
-        dateTitleLabel = new JLabel();
-        dateContentLabel = new JLabel();
-        negozioTitleLabel = new JLabel();
-        negozioContentLabel = new JLabel();
-        spedizioniereTitleLabel = new JLabel();
-        spedizioniereContentLabel = new JLabel();
-	}
-	
-	public void setData(String articolo, String bolla, LocalDate date, String negozio, String spedizioniere) {
-		articoloContentLabel.setText(articolo);
-		bollaContentLabel.setText(bolla);
-		dateContentLabel.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yy")));
-		negozioContentLabel.setText(negozio);
-		spedizioniereContentLabel.setText(spedizioniere);
+		articoloTitleLabel = new JLabel("Articolo: ", JLabel.CENTER);
+        articoloContentLabel = new JLabel(uscita.getArticolo().getUnicode() + " - " + uscita.getArticolo().getType().getUniname(), JLabel.CENTER);
+        bollaTitleLabel = new JLabel("Bolla: ", JLabel.CENTER);
+        bollaContentLabel = new JLabel(uscita.getUscBolla(), JLabel.CENTER);
+        dateTitleLabel = new JLabel("Data: ", JLabel.CENTER);
+        dateContentLabel = new JLabel(uscita.getUscDate().format(DateTimeFormatter.ofPattern("dd/MM/yy")), JLabel.CENTER);
+        negozioTitleLabel = new JLabel("Negozio: ", JLabel.CENTER);
+        negozioContentLabel = new JLabel(uscita.getNegozio().getCodFiscale() + " - " + uscita.getNegozio().getNome(), JLabel.CENTER);
+        spedizioniereTitleLabel = new JLabel("Spedizioniere: ", JLabel.CENTER);
+        spedizioniereContentLabel = new JLabel(uscita.getSpedizioniere(), JLabel.CENTER);
 	}
 }

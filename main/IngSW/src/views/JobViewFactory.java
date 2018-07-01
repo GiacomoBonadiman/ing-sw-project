@@ -1,11 +1,11 @@
 package views;
 
 import controllers.MagazzinoController;
-import interfaces.IJobView;
+import interfaces.IUpdateView;
 
 public class JobViewFactory {
 	
-	public static IJobView getView(String userType) {
+	public static IUpdateView getView(String userType) {
 		if (userType == null) {
 			return null;
 		}
